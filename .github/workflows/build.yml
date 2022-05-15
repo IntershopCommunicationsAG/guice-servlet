@@ -26,5 +26,9 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
+      run: mvn --batch-mode clean deploy -P pgpSigned sonatype
+      env:
+        MAVEN_USERNAME: ${{ secrets.SONATYPEUSER }}
+        MAVEN_PASSWORD: ${{ secrets.SONATYPEPASSWORD }}
+        SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
+        SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
