@@ -36,6 +36,7 @@ jobs:
         SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
         SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
       run: |
+        mkdir $HOME/.mvn
         gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.mvn/secrets.gpg
 
     - name: Build with Maven
