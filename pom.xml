@@ -14,6 +14,11 @@
   <version>5.1.0-jakarta</version>
   <packaging>jar</packaging>
 
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
   <scm>
       <connection>scm:git:git://github.com/IntershopCommunicationsAG/guice-servlet.git</connection>
       <developerConnection>scm:git:ssh://github.com:IntershopCommunicationsAG/guice.git</developerConnection>
