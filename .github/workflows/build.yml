@@ -44,7 +44,7 @@ jobs:
         gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.mvn/secrets.gpg
 
     - name: Build with Maven
-      run: mvn --batch-mode clean deploy -P pgpSigned -P sonatype
+      run: mvn --batch-mode clean deploy -P pgpSigned -P sonatype -e -X
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPEUSER }}
         MAVEN_PASSWORD: ${{ secrets.SONATYPEPASSWORD }}
