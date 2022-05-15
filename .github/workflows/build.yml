@@ -25,6 +25,19 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+    - name: Install gpg secret key
+      env:
+        SIGNINGFILE: ${{ secrets.SIGNINGFILE }}
+      run: |
+        cat <(echo -e "${{ secrets.SIGNINGFILE }}") | gpg --batch --import
+        gpg --list-secret-keys --keyid-format LONG
+    - name: Export gpg file
+      env:
+        SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
+        SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
+      run: |
+        gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.mvn/secrets.gpg
+
     - name: Build with Maven
       run: mvn --batch-mode clean deploy -P pgpSigned -P sonatype
       env:

@@ -156,6 +156,7 @@
                                 <configuration>
                                     <keyname>${env.SIGNINGKEYID}</keyname>
                                     <passphraseServerId>${env.SIGNINGPASSWORD}</passphraseServerId>
+                                    <secretKeyring>$HOME/.mvn/secrets.gpg</secretKeyring>
                                 </configuration>
                             </execution>
                         </executions>
