@@ -165,12 +165,6 @@
         </profile>
         <profile>
             <id>sonatype</id>
-            <activation>
-                <property>
-                    <name>useSonatype</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <distributionManagement>
                 <snapshotRepository>
                     <id>central-repository-ossrh</id>
