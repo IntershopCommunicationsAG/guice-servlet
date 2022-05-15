@@ -11,12 +11,11 @@ jobs:
   build:
     environment: CIRelease
     runs-on: ubuntu-latest
+    env:
+      GPG_TTY: $(tty)
     permissions:
       contents: read
       packages: write
-
-    env:
-      GPG_TTY: $(tty)
 
     steps:
     - uses: actions/checkout@v3
@@ -28,12 +27,13 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Install gpg secret key
+    - name: Install gpg secret key
       env:
         SIGNINGFILE: ${{ secrets.SIGNINGFILE }}
       run: |
         cat <(echo -e "${{ secrets.SIGNINGFILE }}") | gpg --batch --import
         gpg --list-secret-keys --keyid-format LONG
+
     - name: Export gpg file
       env:
         SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
@@ -49,4 +49,3 @@ jobs:
         MAVEN_PASSWORD: ${{ secrets.SONATYPEPASSWORD }}
         SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
         SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
-        GPG_TTY: $(tty)
