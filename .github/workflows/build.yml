@@ -38,6 +38,7 @@ jobs:
       env:
         SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
         SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
+        GPG_TTY: $(tty)
       run: |
         mkdir $HOME/.mvn
         gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.mvn/secrets.gpg
@@ -49,3 +50,4 @@ jobs:
         MAVEN_PASSWORD: ${{ secrets.SONATYPEPASSWORD }}
         SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
         SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
+        GPG_TTY: $(tty)
