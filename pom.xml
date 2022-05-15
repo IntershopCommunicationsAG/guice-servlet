@@ -75,6 +75,8 @@
   </dependencies>
 
   <build>
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -83,7 +85,7 @@
         <configuration>
          <archive>
             <manifestEntries>
-              <Automatic-Module-Name>com.in.servlet</Automatic-Module-Name>
+              <Automatic-Module-Name>guice-servlet</Automatic-Module-Name>
             </manifestEntries>
           </archive>
         </configuration>
@@ -98,7 +100,6 @@
                   <phase>package</phase>
                   <goals>
                       <goal>jar-no-fork</goal>
-                      <goal>test-jar-no-fork</goal>
                   </goals>
               </execution>
           </executions>
