@@ -11,34 +11,51 @@ jobs:
   build:
     environment: CIRelease
     runs-on: ubuntu-latest
-    env:
-      GPG_TTY: $(tty)
+
     permissions:
       contents: read
       packages: write
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: 'temurin'
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: git fetch --all --tags
 
-    - name: Install gpg secret key
-      env:
-        SIGNINGFILE: ${{ secrets.SIGNINGFILE }}
-      run: |
-        cat <(echo -e "${{ secrets.SIGNINGFILE }}") | gpg --batch --import
-        gpg --list-secret-keys --keyid-format LONG
-
-    - name: Build with Maven
-      run: mvn --batch-mode clean deploy -P pgpSigned -P sonatype -e -X
-      env:
-        MAVEN_USERNAME: ${{ secrets.SONATYPEUSER }}
-        MAVEN_PASSWORD: ${{ secrets.SONATYPEPASSWORD }}
-        SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
-        SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
-        GPG_TTY: $(tty)
+      - name: Create .gradle dir
+        run: mkdir -p $HOME/.gradle
+      - name: Install gpg secret key
+        env:
+          SIGNINGFILE: ${{ secrets.SIGNINGFILE }}
+        run: |
+          cat <(echo -e "${{ secrets.SIGNINGFILE }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+      - name: Export gpg file
+        env:
+          SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
+          SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
+        run: |
+          gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.gradle/secrets.gpg
+      - name: Create gradle sproperties
+        env:
+          SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
+          SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
+          SONATYPEPASSWORD: ${{ secrets.SONATYPEPASSWORD }}
+          SONATYPEUSER: ${{ secrets.SONATYPEUSER }}
+        run: echo -e "gradle.publish.key=$APIKEY\ngradle.publish.secret=$APISECRET\nsigning.keyId=$SIGNINGKEYID\nsigning.password=$SIGNINGPASSWORD\nsigning.secretKeyRingFile=$HOME/.gradle/secrets.gpg\nsonatypeUsername=$SONATYPEUSER\nsonatypePassword=$SONATYPEPASSWORD" > $HOME/.gradle/gradle.properties
+      - name: Build and test with Gradle
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=true"
+        run: ./gradlew test build :publishIntershopMvnPublicationToMavenRepository -s --scan
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v1
+        if: always()
+        with:
+          files: build/test-results/**/*.xml
+      - name: Post Build
+        run: rm -f $HOME/.gradle/gradle.properties
