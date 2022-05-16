@@ -96,10 +96,12 @@ signing {
 }
 
 dependencies {
+    implementation("com.google.inject:guice:5.1.0")
+    implementation("com.google.guava:guava:31.1-jre")
+    implementation("jakarta.servlet:jakarta.servlet-api:5.0.0")
     testImplementation("junit:junit:4.13.1")
     testImplementation("org.easymock:easymock:3.1")
-    compileOnly("com.google.inject:guice:5.1.0")
-    compileOnly("jakarta.servlet:jakarta.servlet-api:5.0.0")
+    testImplementation(group = "com.google.inject", name = "guice", version = "5.1.0", classifier = "tests")
 }
 
 repositories {
