@@ -34,15 +34,6 @@ jobs:
         cat <(echo -e "${{ secrets.SIGNINGFILE }}") | gpg --batch --import
         gpg --list-secret-keys --keyid-format LONG
 
-    - name: Export gpg file
-      env:
-        SIGNINGKEYID: ${{ secrets.SIGNINGKEYID }}
-        SIGNINGPASSWORD: ${{ secrets.SIGNINGPASSWORD }}
-        GPG_TTY: $(tty)
-      run: |
-        mkdir $HOME/.mvn
-        gpg --batch --passphrase="$SIGNINGPASSWORD" --pinentry-mode loopback --export-secret-keys $SIGNINGKEYID > $HOME/.mvn/secrets.gpg
-
     - name: Build with Maven
       run: mvn --batch-mode clean deploy -P pgpSigned -P sonatype -e -X
       env:
